@@ -5,10 +5,7 @@ CLASSES = $(SOURCES:.java=.class)
 all: $(CLASSES) OthelloFramework.jar
 
 OthelloFramework.jar: $(CLASSES)
-	jar cfm ../OthelloFramework.jar Manifest.txt *.class
+	jar cvmf Manifest.txt ../OthelloFramework.jar -C ../bin .
 
 %.class: %.java
-	$(JAVAC) $<
-
-clean:
-	rm -f $(CLASSES) OthelloGame*MoveThread.class OthelloGame*InitThread.class
+	$(JAVAC) -d ../bin $<
