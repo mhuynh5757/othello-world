@@ -1,0 +1,139 @@
+////
+//// Source code recreated from a .class file by IntelliJ IDEA
+//// (powered by Fernflower decompiler)
+////
+//
+//import java.util.Iterator;
+//import java.util.LinkedList;
+//import java.util.ListIterator;
+//import java.util.Random;
+//import java.util.TreeSet;
+//
+//public class ConstantTimePlayer implements OthelloPlayer {
+//    private OthelloSide side;
+//    private OthelloSide opponentSide;
+//    private Random gen = new Random();
+//    private OthelloBoard board = new OthelloBoard();
+//
+//    public ConstantTimePlayer() {
+//    }
+//
+//    public void init(OthelloSide var1) {
+//        this.side = var1;
+//        if(var1 == OthelloSide.BLACK) {
+//            this.opponentSide = OthelloSide.WHITE;
+//        } else {
+//            this.opponentSide = OthelloSide.BLACK;
+//        }
+//
+//    }
+//
+//    public Move doMove(Move var1, long var2) {
+//        if(var1 != null) {
+//            this.board.move(var1, this.opponentSide);
+//        }
+//
+//        LinkedList var4 = this.getMoveList(this.board, this.side);
+//        if(var4.size() == 0) {
+//            System.out.println("PASS");
+//            return null;
+//        } else {
+//            ListIterator var6 = var4.listIterator(0);
+//            Move var7 = null;
+//            TreeSet var9 = new TreeSet();
+//
+//            int var10;
+//            while(var6.hasNext()) {
+//                Move var8 = (Move)var6.next();
+//                OthelloBoard var5 = this.board.copy();
+//                var5.move(var8, this.side);
+//                var10 = this.evaluateBoard(var5, this.side);
+//                var9.add(new ScoredMove(var10, var8));
+//            }
+//
+//            System.out.println("Found " + var9.size() + " legal moves.");
+//            var10 = 1;
+//            Iterator var14 = var9.iterator();
+//
+//            for(int var11 = ((ScoredMove)var14.next()).score; var14.hasNext() && ((ScoredMove)var14.next()).score == var11; ++var10) {
+//                ;
+//            }
+//
+//            System.out.println("Found " + var10 + " best moves.");
+//            int var12 = this.gen.nextInt(var10);
+//            System.out.println("Choosing move " + var12);
+//            var14 = var9.iterator();
+//
+//            for(int var13 = 0; var13 <= var12; ++var13) {
+//                var7 = ((ScoredMove)var14.next()).move;
+//            }
+//
+//            System.out.println("Picked: " + var7);
+//            this.board.move(var7, this.side);
+//            return var7;
+//        }
+//    }
+//
+//    private int evaluateBoard(OthelloBoard var1, OthelloSide var2) {
+//        int var3 = 0;
+//
+//        for(int var4 = 0; var4 <= 7; ++var4) {
+//            for(int var5 = 0; var5 <= 7; ++var5) {
+//                if(var1.get(var2, var4, var5)) {
+//                    var3 += this.evaluatePiece(var1, var2, var4, var5);
+//                } else if(var1.get(this.opponentSide, var4, var5)) {
+//                    var3 -= this.evaluatePiece(var1, this.opponentSide, var4, var5);
+//                }
+//            }
+//        }
+//
+//        return var3;
+//    }
+//
+//    private int evaluatePiece(OthelloBoard var1, OthelloSide var2, int var3, int var4) {
+//        int var5 = 1;
+//        if((var3 == 0 || var3 == 7) && (var4 == 0 || var4 == 7)) {
+//            var5 += 40;
+//        }
+//
+//        if(var3 == 0 || var3 == 7 || var4 == 0 || var4 == 7) {
+//            var5 += 10;
+//        }
+//
+//        if(var3 == 1 || var3 == 6 || var4 == 1 || var4 == 6) {
+//            --var5;
+//            if(var3 == 1 && var4 == 1 && !var1.get(var2, 0, 0)) {
+//                var5 -= 5;
+//            }
+//
+//            if(var3 == 1 && var4 == 6 && !var1.get(var2, 0, 7)) {
+//                var5 -= 5;
+//            }
+//
+//            if(var3 == 6 && var4 == 1 && !var1.get(var2, 7, 0)) {
+//                var5 -= 5;
+//            }
+//
+//            if(var3 == 6 && var4 == 6 && !var1.get(var2, 7, 7)) {
+//                var5 -= 5;
+//            }
+//        }
+//
+//        return var5;
+//    }
+//
+//    private LinkedList getMoveList(OthelloBoard var1, OthelloSide var2) {
+//        LinkedList var4 = new LinkedList();
+//
+//        for(int var5 = 0; var5 <= 7; ++var5) {
+//            for(int var6 = 0; var6 <= 7; ++var6) {
+//                Move var3 = new Move(var5, var6);
+//                if(var1.checkMove(var3, var2)) {
+//                    var4.add(var3);
+//                }
+//            }
+//        }
+//
+//        return var4;
+//    }
+//}
