@@ -4,16 +4,7 @@ This AI was written in Java as an included AI and does not use the wrapper class
 Because of this, this AI will only work with this JAR, and the JAR must be recompiled
 after any edit that occurs to the AI.
 
-To test this code, just do:
+To test this code, do:
 ```
-make cleanjava
-make java
-```
-and
-```
-./testgame TheRealSlimShady [other_player]
-```
-or
-```
-./testgame [other_player] TheRealSlimShady
+java -jar OthelloFramework.jar TheRealSlimShady [other_player]
 ```
