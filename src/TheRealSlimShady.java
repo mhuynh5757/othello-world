@@ -1,7 +1,7 @@
 public class TheRealSlimShady implements OthelloPlayer
 {
 
-    private OthelloGame myGame;
+    private OthelloGame game;
     private OthelloSide mySide;
 
     @Override
@@ -13,23 +13,29 @@ public class TheRealSlimShady implements OthelloPlayer
     @Override
     public Move doMove(Move opponentsMove, long millisLeft)
     {
-        long start_time = System.currentTimeMillis();
         int x = 0, y = 0;
         Move result = new Move(x, y);
 
-        while (!myGame.getBoard().checkMove(new Move(x, y), mySide))
+        while (!game.getBoard()
+                .checkMove(new Move(x, y), mySide))
         {
-            result.setX(++x);
-            result.setY(++y);
+            if (++x > 7)
+            {
+                x = 0;
+                ++y;
+            }
+            if (y > 7)
+            {
+                return null;
+            }
+            result.set(x, y);
         }
-
-
 
         return result;
     }
 
     public void setGame(OthelloGame g)
     {
-        myGame = g;
+        game = g;
     }
 }

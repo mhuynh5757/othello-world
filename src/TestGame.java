@@ -19,18 +19,16 @@ public class TestGame
         // Initialize the players.
         int which = 1;
         OthelloPlayer[] players = new OthelloPlayer[2];
-        int realSlimShady = 0;
-        boolean is_realSlimShady = false;
         for (int i = 0; i < 2; i++)
         {
             if (args[i].equalsIgnoreCase("SimplePlayer"))
             {
                 players[i] = new SimplePlayer();
             }
-            else if (args[i].equalsIgnoreCase("ConstantTimePlayer"))
-            {
-                players[i] = new ConstantTimePlayer();
-            }
+//            else if (args[i].equalsIgnoreCase("ConstantTimePlayer"))
+//            {
+//                players[i] = new ConstantTimePlayer();
+//            }
             else if (args[i].equalsIgnoreCase("BetterPlayer"))
             {
                 players[i] = new BetterPlayer();
@@ -38,8 +36,6 @@ public class TestGame
             else if (args[i].equalsIgnoreCase("TheRealSlimShady"))
             {
                 players[i] = new TheRealSlimShady();
-                realSlimShady = i;
-                is_realSlimShady = true;
             }
             else if (args[i].equalsIgnoreCase("Human"))
             {
@@ -74,11 +70,11 @@ public class TestGame
             }
         }
 
-        if (is_realSlimShady)
+        for (OthelloPlayer p : players)
         {
-            if (players[realSlimShady] instanceof TheRealSlimShady)
+            if (p instanceof TheRealSlimShady)
             {
-                ((TheRealSlimShady) players[realSlimShady]).setGame(g);
+                ((TheRealSlimShady) p).setGame(g);
             }
         }
 

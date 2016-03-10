@@ -31,6 +31,12 @@ public class Move implements Serializable
         this.y = y;
     }
 
+    public void set(int new_x, int new_y)
+    {
+        x = new_x;
+        y = new_y;
+    }
+
     /**
      * Returns the x-coordinate of the move.
      *
