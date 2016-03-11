@@ -20,6 +20,12 @@ class scorePair
     {
         return move;
     }
+
+    @Override
+    public String toString()
+    {
+        return "Move: " + getMove().toString() + " | Score: " + getScore();
+    }
 }
 
 public class TheRealSlimShady implements OthelloPlayer
@@ -31,38 +37,15 @@ public class TheRealSlimShady implements OthelloPlayer
     private OthelloSide oppSide;
 
     private int[][] heuristicScore = {
-            {100, -25, 5, 5, 5, 5, -25, 100},
-            {-25, -50, 5, 5, 5, 5, -50, -25},
-            {5, 5, 5, 5, 5, 5, 5, 5},
-            {5, 5, 5, 5, 5, 5, 5, 5},
-            {5, 5, 5, 5, 5, 5, 5, 5},
-            {5, 5, 5, 5, 5, 5, 5, 5},
-            {-25, -50, 5, 5, 5, 5, -50, -25},
-            {100, -25, 5, 5, 5, 5, -25, 100}
+            {40, 5, 10, 10, 10, 10, 5, 40},
+            {5, 0, 10, 10, 10, 10, 0, 5},
+            {10, 10, 10, 10, 10, 10, 10, 10},
+            {10, 10, 10, 10, 10, 10, 10, 10},
+            {10, 10, 10, 10, 10, 10, 10, 10},
+            {10, 10, 10, 10, 10, 10, 10, 10},
+            {5, 0, 10, 10, 10, 10, 0, 5},
+            {40, 5, 10, 10, 10, 10, 5, 40},
     };
-
-    @Override
-    public void init(OthelloSide side)
-    {
-        mySide = side;
-        oppSide = mySide.opposite();
-    }
-
-    @Override
-    public Move doMove(Move opponentsMove, long millisLeft)
-    {
-        if (!game.getBoard()
-                .hasMoves(mySide))
-        {
-            return null;
-        }
-
-        OthelloBoard b = game.getBoard();
-
-        scorePair res = minimax(b);
-
-        return res.getMove();
-    }
 
     private int scoreBoard(OthelloBoard b)
     {
@@ -75,7 +58,7 @@ public class TheRealSlimShady implements OthelloPlayer
                 {
                     score += heuristicScore[i][j];
                 }
-                else
+                else if (b.get(oppSide, j, i))
                 {
                     score -= heuristicScore[i][j];
                 }
@@ -84,63 +67,91 @@ public class TheRealSlimShady implements OthelloPlayer
         return score;
     }
 
-    private scorePair minimax(OthelloBoard b)
+    private ArrayList<Move> findPossibleMoves(OthelloBoard b, OthelloSide s)
     {
-        ArrayList<scorePair> scores = new ArrayList<>();
-
-        if (b.hasMoves(mySide))
+        ArrayList<Move> moves = new ArrayList<>();
+        for (int i = 0; i < 8; i++)
         {
-            for (int i = 0; i < 8; i++)
+            for (int j = 0; j < 8; j++)
             {
-                for (int j = 0; j < 8; j++)
+                Move m = new Move(j, i);
+                if (b.checkMove(m, s))
                 {
-                    Move myMove = new Move(j, i);
-                    if (b.checkMove(myMove, mySide))
-                    {
-                        OthelloBoard my_new_board = b.copy();
-                        my_new_board.move(myMove, mySide);
-                        if (my_new_board.hasMoves(oppSide))
-                        {
-                            for (int k = 0; k < 8; k++)
-                            {
-                                for (int l = 0; l < 8; l++)
-                                {
-                                    Move theirMove = new Move(l, k);
-                                    if (my_new_board.checkMove(theirMove, oppSide))
-                                    {
-                                        OthelloBoard their_new_board = my_new_board.copy();
-                                        their_new_board.move(theirMove, oppSide);
-                                        scores.add(new scorePair(scoreBoard(their_new_board), myMove));
-                                    }
-                                }
-                            }
-                        }
-                        else
-                        {
-                            scores.add(new scorePair(scoreBoard(my_new_board), myMove));
-                        }
-                    }
+                    moves.add(m);
                 }
             }
         }
-        if (scores.size() > 0)
+        return moves;
+    }
+
+    @Override
+    public void init(OthelloSide side)
+    {
+        mySide = side;
+        oppSide = mySide.opposite();
+    }
+
+    @Override
+    public Move doMove(Move opponentsMove, long millisLeft)
+    {
+        OthelloBoard curr_board = game.getBoard();
+
+        ArrayList<Move> possible_moves = findPossibleMoves(curr_board, mySide);
+
+        if (possible_moves.size() > 0)
         {
-            int best_score = scores.get(0).getScore();
-            int best_sp = 0;
-            for (int i = 0; i < scores.size(); i++)
+            Move best_move = possible_moves.get(0);
+
+            OthelloBoard new_board = curr_board.copy();
+            new_board.move(best_move, mySide);
+            int best_score = minimax(new_board, oppSide, 3);
+
+            for (int i = 1; i < possible_moves.size(); i++)
             {
-                if (best_score < scores.get(i).getScore())
+                new_board = curr_board.copy();
+                new_board.move(possible_moves.get(i), mySide);
+                int temp_s = minimax(new_board, oppSide, 3);
+                if (temp_s > best_score)
                 {
-                    best_score = scores.get(i).getScore();
-                    best_sp = i;
+                    best_score = temp_s;
+                    best_move = possible_moves.get(i);
                 }
             }
-            return scores.get(best_sp);
+
+            return best_move;
         }
         else
         {
             return null;
         }
+    }
+
+    private int minimax(OthelloBoard b, OthelloSide s, int depth)
+    {
+        if (depth > 0)
+        {
+            ArrayList<Move> possible_moves = findPossibleMoves(b, s);
+            ArrayList<Integer> scores = new ArrayList<>();
+            for (Move mv : possible_moves)
+            {
+                OthelloBoard new_board = b.copy();
+                new_board.move(mv, s);
+                scores.add(minimax(new_board, s.opposite(), depth - 1));
+            }
+            if (scores.size() > 0)
+            {
+                int min_score = scores.get(0);
+                for (Integer i : scores)
+                {
+                    if (min_score > i)
+                    {
+                        min_score = i;
+                    }
+                }
+                return min_score;
+            }
+        }
+        return scoreBoard(b);
     }
 
     public void setGame(OthelloGame g)
