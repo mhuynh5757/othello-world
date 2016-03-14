@@ -1,33 +1,5 @@
 import java.util.ArrayList;
 
-class scorePair
-{
-    int score = 0;
-    Move move;
-
-    scorePair(int s, Move m)
-    {
-        score = s;
-        move = m;
-    }
-
-    int getScore()
-    {
-        return score;
-    }
-
-    Move getMove()
-    {
-        return move;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "Move: " + getMove().toString() + " | Score: " + getScore();
-    }
-}
-
 public class TheRealSlimShady implements OthelloPlayer
 {
     private OthelloGame game;
@@ -37,30 +9,30 @@ public class TheRealSlimShady implements OthelloPlayer
     private OthelloSide oppSide;
 
     private int[][] heuristicScore = {
-            {40, 5, 10, 10, 10, 10, 5, 40},
-            {5, 0, 10, 10, 10, 10, 0, 5},
-            {10, 10, 10, 10, 10, 10, 10, 10},
-            {10, 10, 10, 10, 10, 10, 10, 10},
-            {10, 10, 10, 10, 10, 10, 10, 10},
-            {10, 10, 10, 10, 10, 10, 10, 10},
-            {5, 0, 10, 10, 10, 10, 0, 5},
-            {40, 5, 10, 10, 10, 10, 5, 40},
+            { 20, -3, 11,  8,  8, 11, -3, 20},
+            { -3, -7, -4,  1,  1, -4, -7, -3},
+            { 11, -4,  2,  2,  2,  2, -4, 11},
+            {  8,  1,  2, -3, -3,  2,  1,  8},
+            {  8,  1,  2, -3, -3,  2,  1,  8},
+            { 11, -4,  2,  2,  2,  2, -4, 11},
+            { -3, -7, -4,  1,  1, -4, -7, -3},
+            { 20, -3, 11,  8,  8, 11, -3, 20},
     };
 
-    private int scoreBoard(OthelloBoard b)
+    private int scoreBoard(OthelloBoard b, OthelloSide s)
     {
         int score = 0;
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
             {
-                if (b.get(mySide, j, i))
+                if(b.get(s, j, i))
                 {
-                    score += heuristicScore[i][j];
+                    score += heuristicScore[j][i];
                 }
-                else if (b.get(oppSide, j, i))
+                else if (b.get(s.opposite(), j, i))
                 {
-                    score -= heuristicScore[i][j];
+                    score -= heuristicScore[j][i];
                 }
             }
         }
@@ -94,64 +66,66 @@ public class TheRealSlimShady implements OthelloPlayer
     @Override
     public Move doMove(Move opponentsMove, long millisLeft)
     {
-        OthelloBoard curr_board = game.getBoard();
+        OthelloBoard b = game.getBoard().copy();
 
-        ArrayList<Move> possible_moves = findPossibleMoves(curr_board, mySide);
-
-        if (possible_moves.size() > 0)
-        {
-            Move best_move = possible_moves.get(0);
-
-            OthelloBoard new_board = curr_board.copy();
-            new_board.move(best_move, mySide);
-            int best_score = minimax(new_board, oppSide, 3);
-
-            for (int i = 1; i < possible_moves.size(); i++)
-            {
-                new_board = curr_board.copy();
-                new_board.move(possible_moves.get(i), mySide);
-                int temp_s = minimax(new_board, oppSide, 3);
-                if (temp_s > best_score)
-                {
-                    best_score = temp_s;
-                    best_move = possible_moves.get(i);
-                }
-            }
-
-            return best_move;
-        }
-        else
+        if (!b.hasMoves(mySide))
         {
             return null;
         }
-    }
 
-    private int minimax(OthelloBoard b, OthelloSide s, int depth)
-    {
-        if (depth > 0)
+        ArrayList<Move> possible_moves = findPossibleMoves(b, mySide);
+
+        int max_score = Integer.MIN_VALUE;
+        Move best_move = possible_moves.get(0);
+        for (Move m : possible_moves)
         {
-            ArrayList<Move> possible_moves = findPossibleMoves(b, s);
-            ArrayList<Integer> scores = new ArrayList<>();
-            for (Move mv : possible_moves)
+            OthelloBoard new_board = b.copy();
+            new_board.move(m, mySide);
+            int score = -negascout(new_board, oppSide, Integer.MIN_VALUE, Integer.MAX_VALUE, 5);
+            if (max_score < score)
             {
-                OthelloBoard new_board = b.copy();
-                new_board.move(mv, s);
-                scores.add(minimax(new_board, s.opposite(), depth - 1));
-            }
-            if (scores.size() > 0)
-            {
-                int min_score = scores.get(0);
-                for (Integer i : scores)
-                {
-                    if (min_score > i)
-                    {
-                        min_score = i;
-                    }
-                }
-                return min_score;
+                max_score = score;
+                best_move = m;
+                System.out.println("Possible move: " + m.toString() + " Score: " + score);
             }
         }
-        return scoreBoard(b);
+
+        System.out.println("Best move: " + best_move.toString() + " Score: " + max_score);
+
+        return best_move;
+    }
+
+    private int negascout(OthelloBoard board, OthelloSide side, int alpha, int beta, int depth)
+    {
+        if (!board.hasMoves(side) || depth <= 0)
+        {
+            return scoreBoard(board, side);
+        }
+        ArrayList<Move> possible_moves = findPossibleMoves(board, side);
+        for (int i = 0; i < possible_moves.size(); i++)
+        {
+            OthelloBoard new_board = board.copy();
+            new_board.move(possible_moves.get(i), side);
+            int score;
+            if (i > 0)
+            {
+                score = -negascout(new_board, side.opposite(), -alpha - 1, -alpha, depth - 1);
+                if (alpha < score && score < beta)
+                {
+                    score = -negascout(new_board, side.opposite(), -beta, -score, depth - 1);
+                }
+            }
+            else
+            {
+                score = -negascout(new_board, side.opposite(), -beta, -alpha, depth - 1);
+            }
+            alpha = Math.max(alpha, score);
+            if (alpha >= beta)
+            {
+                return alpha;
+            }
+        }
+        return alpha;
     }
 
     public void setGame(OthelloGame g)

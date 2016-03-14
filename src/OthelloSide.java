@@ -5,7 +5,7 @@
  * <p>
  * $Id: OthelloSide.java,v 1.8 2005/02/28 10:33:33 plattner Exp $
  **/
-public final class OthelloSide
+public final class OthelloSide implements Comparable
 {
     /**
      * A private constructor to ensure nobody makes more sides.
@@ -75,5 +75,22 @@ public final class OthelloSide
         {
             throw new IllegalArgumentException();
         }
+    }
+
+    @Override
+    public int compareTo(Object o)
+    {
+        if (o instanceof OthelloSide)
+        {
+            if (((OthelloSide)o) == this)
+            {
+                return 0;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        return -1;
     }
 }

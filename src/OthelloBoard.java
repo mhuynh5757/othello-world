@@ -6,7 +6,7 @@ import java.util.BitSet;
  *
  * @author Brandon Moore
  **/
-public class OthelloBoard
+public class OthelloBoard implements Comparable
 {
     //locations that have a black piece
     BitSet black = new BitSet(64);
@@ -221,5 +221,19 @@ public class OthelloBoard
         BitSet result = (BitSet) taken.clone();
         result.andNot(black);
         return result.cardinality();
+    }
+
+    @Override
+    public int compareTo(Object o)
+    {
+        if (!(o instanceof OthelloBoard))
+        {
+            return -1;
+        }
+        if (black.equals(((OthelloBoard) o).black) && (taken.equals(((OthelloBoard) o).taken)))
+        {
+            return 0;
+        }
+        return 1;
     }
 }

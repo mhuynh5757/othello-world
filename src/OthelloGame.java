@@ -258,6 +258,9 @@ public class OthelloGame implements Runnable
             // The total running time for these guys is already set.
             observer.OnGameOver(r);
         }
+
+        System.out.println("Black time: " + r.blackTime);
+        System.out.println("White time: " + r.whiteTime);
     }
 
     /**

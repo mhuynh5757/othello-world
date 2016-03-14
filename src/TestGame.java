@@ -1,6 +1,5 @@
 public class TestGame
 {
-
     public static void main(String[] args)
     {
         if (args.length != 2 && args.length != 3)
@@ -57,7 +56,7 @@ public class TestGame
         }
         else
         {
-            // Parse timeout arg.       
+            // Parse timeout arg.
             try
             {
                 long timeout = Integer.parseInt(args[2]);
