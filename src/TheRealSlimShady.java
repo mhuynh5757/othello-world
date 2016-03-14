@@ -81,7 +81,7 @@ public class TheRealSlimShady implements OthelloPlayer
         {
             OthelloBoard new_board = b.copy();
             new_board.move(m, mySide);
-            int score = -negascout(new_board, oppSide, Integer.MIN_VALUE, Integer.MAX_VALUE, 5);
+            int score = -negascout(new_board, oppSide, Integer.MIN_VALUE, Integer.MAX_VALUE, 3);
             if (max_score < score)
             {
                 max_score = score;

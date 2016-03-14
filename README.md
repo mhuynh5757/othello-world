@@ -6,5 +6,6 @@ after any edit that occurs to the AI.
 
 To test this code, do:
 ```
+make java
 java -jar OthelloFramework.jar TheRealSlimShady [other_player]
 ```
